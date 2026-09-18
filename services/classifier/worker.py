@@ -4,7 +4,7 @@ from shared.config import settings
 import ollama
 import json
 
-dedup_queue = Queue("document-deduplicate", {"connection": {"host": "redis", "port": 6379}})
+dedup_queue = Queue("document-deduplicate", {"connection": {"host": settings.redis_host, "port": settings.redis_port}})
 
 async def process_classify(job, job_token):
     minio = get_minio()

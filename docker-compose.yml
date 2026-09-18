@@ -27,7 +27,7 @@ services:
     ports:
     - 5432:5432
     volumes:
-    - postgres_data:/var/lib/postgresql/data
+    - postgres_data_v18:/var/lib/postgresql
     healthcheck:
       test:
       - CMD-SHELL
@@ -53,7 +53,7 @@ services:
     volumes:
     - minio_data:/data
   crawl4ai:
-    image: unclecode/crawl4ai:basic-amd64
+    image: unclecode/crawl4ai:latest
     container_name: ai_mentor_crawl4ai
     ports:
     - 11225:11225
@@ -412,7 +412,7 @@ services:
     volumes:
     - mongo_data:/data/db
 volumes:
-  postgres_data: null
+  postgres_data_v18: null
   minio_data: null
   mongo_data: null
   ollama_data: null

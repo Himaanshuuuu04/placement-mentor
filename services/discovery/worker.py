@@ -5,7 +5,9 @@ import httpx
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 
-crawl_fetch_queue = Queue("crawl-fetch", {"connection": {"host": "redis", "port": 6379}})
+from shared.config import settings
+
+crawl_fetch_queue = Queue("crawl-fetch", {"connection": {"host": settings.redis_host, "port": settings.redis_port}})
 
 async def process_discovery(job, job_token):
     await init_postgres()

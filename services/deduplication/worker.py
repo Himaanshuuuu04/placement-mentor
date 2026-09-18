@@ -1,7 +1,9 @@
 from bullmq import Queue
 import hashlib
 
-embed_queue = Queue("document-embed", {"connection": {"host": "redis", "port": 6379}})
+from shared.config import settings
+
+embed_queue = Queue("document-embed", {"connection": {"host": settings.redis_host, "port": settings.redis_port}})
 
 async def process_dedup(job, job_token):
     # Level 1 (URL) is handled in DB

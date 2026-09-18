@@ -7,12 +7,12 @@ mongo_client = None
 
 async def init_postgres():
     global postgres_pool
-    if settings.postgres_dsn:
+    if settings.postgres_dsn and not postgres_pool:
         postgres_pool = await asyncpg.create_pool(dsn=settings.postgres_dsn)
 
 async def init_mongo():
     global mongo_client
-    if settings.mongo_uri:
+    if settings.mongo_uri and not mongo_client:
         mongo_client = AsyncIOMotorClient(settings.mongo_uri)
 
 async def close_postgres():

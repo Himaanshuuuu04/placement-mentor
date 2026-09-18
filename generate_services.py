@@ -23,6 +23,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from bullmq import Queue
 from shared.config import settings
+from shared.config import settings
 import asyncpg
 from shared.db import get_postgres, init_postgres
 
@@ -96,13 +97,14 @@ if __name__ == "__main__":
 ''',
         'worker.py': '''
 from bullmq import Queue
+from shared.config import settings
 from shared.db import get_postgres, init_postgres
 import uuid
 import httpx
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 
-crawl_fetch_queue = Queue("crawl-fetch", {"connection": {"host": "redis", "port": 6379}})
+crawl_fetch_queue = Queue("crawl-fetch", {"connection": {"host": settings.redis_host, "port": settings.redis_port}})
 
 async def process_discovery(job, job_token):
     await init_postgres()
@@ -164,6 +166,7 @@ if __name__ == "__main__":
 ''',
         'worker.py': '''
 from bullmq import Queue
+from shared.config import settings
 from shared.storage import get_minio
 from shared.db import get_postgres, init_postgres
 import uuid
@@ -171,7 +174,7 @@ import httpx
 import json
 import io
 
-process_queue = Queue("document-process", {"connection": {"host": "redis", "port": 6379}})
+process_queue = Queue("document-process", {"connection": {"host": settings.redis_host, "port": settings.redis_port}})
 
 async def process_fetch(job, job_token):
     await init_postgres()
@@ -229,12 +232,13 @@ if __name__ == "__main__":
 ''',
         'worker.py': '''
 from bullmq import Queue
+from shared.config import settings
 from shared.storage import get_minio
 from shared.db import get_postgres, init_postgres
 import io
 import uuid
 
-classify_queue = Queue("document-classify", {"connection": {"host": "redis", "port": 6379}})
+classify_queue = Queue("document-classify", {"connection": {"host": settings.redis_host, "port": settings.redis_port}})
 
 async def process_document(job, job_token):
     await init_postgres()
@@ -277,12 +281,13 @@ if __name__ == "__main__":
 ''',
         'worker.py': '''
 from bullmq import Queue
+from shared.config import settings
 from shared.storage import get_minio
 from shared.config import settings
 import ollama
 import json
 
-dedup_queue = Queue("document-deduplicate", {"connection": {"host": "redis", "port": 6379}})
+dedup_queue = Queue("document-deduplicate", {"connection": {"host": settings.redis_host, "port": settings.redis_port}})
 
 async def process_classify(job, job_token):
     minio = get_minio()
@@ -326,9 +331,10 @@ if __name__ == "__main__":
 ''',
         'worker.py': '''
 from bullmq import Queue
+from shared.config import settings
 import hashlib
 
-embed_queue = Queue("document-embed", {"connection": {"host": "redis", "port": 6379}})
+embed_queue = Queue("document-embed", {"connection": {"host": settings.redis_host, "port": settings.redis_port}})
 
 async def process_dedup(job, job_token):
     # Level 1 (URL) is handled in DB

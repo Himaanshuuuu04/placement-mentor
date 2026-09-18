@@ -4,7 +4,9 @@ from shared.db import get_postgres, init_postgres
 import io
 import uuid
 
-classify_queue = Queue("document-classify", {"connection": {"host": "redis", "port": 6379}})
+from shared.config import settings
+
+classify_queue = Queue("document-classify", {"connection": {"host": settings.redis_host, "port": settings.redis_port}})
 
 async def process_document(job, job_token):
     await init_postgres()
@@ -20,7 +22,8 @@ async def process_document(job, job_token):
     # Basic normalization (boilerplate removal should be here)
     processed = markdown.strip()
     
-    minio.put_object("processed", f"{doc_id}/v{version}/clean.md", io.BytesIO(processed.encode()), len(processed))
+    processed_bytes = processed.encode('utf-8')
+    minio.put_object("processed", f"{doc_id}/v{version}/clean.md", io.BytesIO(processed_bytes), len(processed_bytes))
     
     async with pool.acquire() as conn:
         await conn.execute(

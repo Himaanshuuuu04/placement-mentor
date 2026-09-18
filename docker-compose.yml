@@ -1,0 +1,382 @@
+version: '3.8'
+services:
+  tools:
+    image: python:3.11-slim
+    profiles:
+    - tools
+    volumes:
+    - .:/app
+    working_dir: /app
+    environment:
+    - POSTGRES_DSN=${POSTGRES_DSN}
+    - MONGO_URI=${MONGO_URI}
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - MINIO_ENDPOINT=http://minio:9000
+    depends_on:
+    - postgres
+    - redis
+    - minio
+  postgres:
+    image: postgres:18-alpine
+    container_name: ai_mentor_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ai_mentor}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-ai_mentor_db}
+    ports:
+    - 5432:5432
+    volumes:
+    - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready -U ${POSTGRES_USER:-ai_mentor} -d ${POSTGRES_DB:-ai_mentor_db}
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  redis:
+    image: redis:7-alpine
+    container_name: ai_mentor_redis
+    ports:
+    - 6379:6379
+  minio:
+    image: quay.io/minio/minio:latest
+    container_name: ai_mentor_minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin123}
+    ports:
+    - 9000:9000
+    - 9001:9001
+    command: server /data --console-address ":9001"
+    volumes:
+    - minio_data:/data
+  crawl4ai:
+    image: unclecode/crawl4ai:basic-amd64
+    container_name: ai_mentor_crawl4ai
+    ports:
+    - 11225:11225
+  api-gateway:
+    build:
+      context: .
+      dockerfile: services/api-gateway/Dockerfile
+    container_name: ai_mentor_api-gateway
+    ports:
+    - 8001:8000
+    environment:
+    - APP_NAME=api-gateway
+    - POSTGRES_DSN=${POSTGRES_DSN}
+    - MONGO_URI=${MONGO_URI}
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - MINIO_ENDPOINT=http://minio:9000
+    depends_on:
+    - redis
+  identity:
+    build:
+      context: .
+      dockerfile: services/identity/Dockerfile
+    container_name: ai_mentor_identity
+    ports:
+    - 8002:8000
+    environment:
+    - APP_NAME=identity
+    - POSTGRES_DSN=${POSTGRES_DSN}
+    - MONGO_URI=${MONGO_URI}
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - MINIO_ENDPOINT=http://minio:9000
+    depends_on:
+    - redis
+  company:
+    build:
+      context: .
+      dockerfile: services/company/Dockerfile
+    container_name: ai_mentor_company
+    ports:
+    - 8003:8000
+    environment:
+    - APP_NAME=company
+    - POSTGRES_DSN=${POSTGRES_DSN}
+    - MONGO_URI=${MONGO_URI}
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - MINIO_ENDPOINT=http://minio:9000
+    depends_on:
+    - redis
+  question:
+    build:
+      context: .
+      dockerfile: services/question/Dockerfile
+    container_name: ai_mentor_question
+    ports:
+    - 8004:8000
+    environment:
+    - APP_NAME=question
+    - POSTGRES_DSN=${POSTGRES_DSN}
+    - MONGO_URI=${MONGO_URI}
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - MINIO_ENDPOINT=http://minio:9000
+    depends_on:
+    - redis
+  assessment:
+    build:
+      context: .
+      dockerfile: services/assessment/Dockerfile
+    container_name: ai_mentor_assessment
+    ports:
+    - 8005:8000
+    environment:
+    - APP_NAME=assessment
+    - POSTGRES_DSN=${POSTGRES_DSN}
+    - MONGO_URI=${MONGO_URI}
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - MINIO_ENDPOINT=http://minio:9000
+    depends_on:
+    - redis
+  evaluation:
+    build:
+      context: .
+      dockerfile: services/evaluation/Dockerfile
+    container_name: ai_mentor_evaluation
+    ports:
+    - 8006:8000
+    environment:
+    - APP_NAME=evaluation
+    - POSTGRES_DSN=${POSTGRES_DSN}
+    - MONGO_URI=${MONGO_URI}
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - MINIO_ENDPOINT=http://minio:9000
+    depends_on:
+    - redis
+  mastery:
+    build:
+      context: .
+      dockerfile: services/mastery/Dockerfile
+    container_name: ai_mentor_mastery
+    ports:
+    - 8007:8000
+    environment:
+    - APP_NAME=mastery
+    - POSTGRES_DSN=${POSTGRES_DSN}
+    - MONGO_URI=${MONGO_URI}
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - MINIO_ENDPOINT=http://minio:9000
+    depends_on:
+    - redis
+  interview:
+    build:
+      context: .
+      dockerfile: services/interview/Dockerfile
+    container_name: ai_mentor_interview
+    ports:
+    - 8008:8000
+    environment:
+    - APP_NAME=interview
+    - POSTGRES_DSN=${POSTGRES_DSN}
+    - MONGO_URI=${MONGO_URI}
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - MINIO_ENDPOINT=http://minio:9000
+    depends_on:
+    - redis
+  roadmap:
+    build:
+      context: .
+      dockerfile: services/roadmap/Dockerfile
+    container_name: ai_mentor_roadmap
+    ports:
+    - 8009:8000
+    environment:
+    - APP_NAME=roadmap
+    - POSTGRES_DSN=${POSTGRES_DSN}
+    - MONGO_URI=${MONGO_URI}
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - MINIO_ENDPOINT=http://minio:9000
+    depends_on:
+    - redis
+  agent-orchestrator:
+    build:
+      context: .
+      dockerfile: services/agent-orchestrator/Dockerfile
+    container_name: ai_mentor_agent-orchestrator
+    ports:
+    - 8010:8000
+    environment:
+    - APP_NAME=agent-orchestrator
+    - POSTGRES_DSN=${POSTGRES_DSN}
+    - MONGO_URI=${MONGO_URI}
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - MINIO_ENDPOINT=http://minio:9000
+    depends_on:
+    - redis
+  retrieval:
+    build:
+      context: .
+      dockerfile: services/retrieval/Dockerfile
+    container_name: ai_mentor_retrieval
+    ports:
+    - 8011:8000
+    environment:
+    - APP_NAME=retrieval
+    - POSTGRES_DSN=${POSTGRES_DSN}
+    - MONGO_URI=${MONGO_URI}
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - MINIO_ENDPOINT=http://minio:9000
+    depends_on:
+    - redis
+  discovery:
+    build:
+      context: .
+      dockerfile: services/discovery/Dockerfile
+    container_name: ai_mentor_discovery
+    ports:
+    - 8012:8000
+    environment:
+    - APP_NAME=discovery
+    - POSTGRES_DSN=${POSTGRES_DSN}
+    - MONGO_URI=${MONGO_URI}
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - MINIO_ENDPOINT=http://minio:9000
+    depends_on:
+    - redis
+  crawler:
+    build:
+      context: .
+      dockerfile: services/crawler/Dockerfile
+    container_name: ai_mentor_crawler
+    ports:
+    - 8013:8000
+    environment:
+    - APP_NAME=crawler
+    - POSTGRES_DSN=${POSTGRES_DSN}
+    - MONGO_URI=${MONGO_URI}
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - MINIO_ENDPOINT=http://minio:9000
+    depends_on:
+    - redis
+  document-processor:
+    build:
+      context: .
+      dockerfile: services/document-processor/Dockerfile
+    container_name: ai_mentor_document-processor
+    ports:
+    - 8014:8000
+    environment:
+    - APP_NAME=document-processor
+    - POSTGRES_DSN=${POSTGRES_DSN}
+    - MONGO_URI=${MONGO_URI}
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - MINIO_ENDPOINT=http://minio:9000
+    depends_on:
+    - redis
+  classifier:
+    build:
+      context: .
+      dockerfile: services/classifier/Dockerfile
+    container_name: ai_mentor_classifier
+    ports:
+    - 8015:8000
+    environment:
+    - APP_NAME=classifier
+    - POSTGRES_DSN=${POSTGRES_DSN}
+    - MONGO_URI=${MONGO_URI}
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - MINIO_ENDPOINT=http://minio:9000
+    depends_on:
+    - redis
+  deduplication:
+    build:
+      context: .
+      dockerfile: services/deduplication/Dockerfile
+    container_name: ai_mentor_deduplication
+    ports:
+    - 8016:8000
+    environment:
+    - APP_NAME=deduplication
+    - POSTGRES_DSN=${POSTGRES_DSN}
+    - MONGO_URI=${MONGO_URI}
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - MINIO_ENDPOINT=http://minio:9000
+    depends_on:
+    - redis
+  embedding:
+    build:
+      context: .
+      dockerfile: services/embedding/Dockerfile
+    container_name: ai_mentor_embedding
+    ports:
+    - 8017:8000
+    environment:
+    - APP_NAME=embedding
+    - POSTGRES_DSN=${POSTGRES_DSN}
+    - MONGO_URI=${MONGO_URI}
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - MINIO_ENDPOINT=http://minio:9000
+    depends_on:
+    - redis
+  code-execution:
+    build:
+      context: .
+      dockerfile: services/code-execution/Dockerfile
+    container_name: ai_mentor_code-execution
+    ports:
+    - 8018:8000
+    environment:
+    - APP_NAME=code-execution
+    - POSTGRES_DSN=${POSTGRES_DSN}
+    - MONGO_URI=${MONGO_URI}
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - MINIO_ENDPOINT=http://minio:9000
+    depends_on:
+    - redis
+  realtime:
+    build:
+      context: .
+      dockerfile: services/realtime/Dockerfile
+    container_name: ai_mentor_realtime
+    ports:
+    - 8019:8000
+    environment:
+    - APP_NAME=realtime
+    - POSTGRES_DSN=${POSTGRES_DSN}
+    - MONGO_URI=${MONGO_URI}
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - MINIO_ENDPOINT=http://minio:9000
+    depends_on:
+    - redis
+  knowledge-ingestion:
+    build:
+      context: .
+      dockerfile: services/knowledge-ingestion/Dockerfile
+    container_name: ai_mentor_knowledge-ingestion
+    ports:
+    - 8020:8000
+    environment:
+    - APP_NAME=knowledge-ingestion
+    - POSTGRES_DSN=${POSTGRES_DSN}
+    - MONGO_URI=${MONGO_URI}
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - MINIO_ENDPOINT=http://minio:9000
+    depends_on:
+    - redis
+volumes:
+  postgres_data: null
+  minio_data: null

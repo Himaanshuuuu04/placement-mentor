@@ -1,0 +1,9 @@
+
+fastapi
+uvicorn
+pydantic
+pydantic-settings
+asgi-correlation-id
+python-json-logger
+bullmq
+-e /app/packages/shared

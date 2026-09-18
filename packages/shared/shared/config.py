@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     aws_access_key_id: str = ""
     aws_secret_access_key: str = ""
     aws_default_region: str = "us-east-1"
+    ollama_base_url: str = "http://ollama:11434"
 
     class Config:
         env_file = ".env"

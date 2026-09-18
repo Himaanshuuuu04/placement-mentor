@@ -1,11 +1,11 @@
-
-import logging
-from shared.api import create_app
+import asyncio
+from bullmq import Worker
 from shared.config import settings
+from worker import process_document
 
-app = create_app("document-processor")
-logger = logging.getLogger(__name__)
+async def main():
+    worker = Worker("document-process", process_document, {"connection": {"host": settings.redis_host, "port": settings.redis_port}})
+    await asyncio.Future()
 
-@app.on_event("startup")
-async def startup_event():
-    logger.info(f"Starting document-processor service. Postgres: {settings.postgres_dsn != ''}")
+if __name__ == "__main__":
+    asyncio.run(main())

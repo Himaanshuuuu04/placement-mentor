@@ -1,11 +1,11 @@
-
-import logging
-from shared.api import create_app
+import asyncio
+from bullmq import Worker
 from shared.config import settings
+from worker import process_classify
 
-app = create_app("classifier")
-logger = logging.getLogger(__name__)
+async def main():
+    worker = Worker("document-classify", process_classify, {"connection": {"host": settings.redis_host, "port": settings.redis_port}})
+    await asyncio.Future()
 
-@app.on_event("startup")
-async def startup_event():
-    logger.info(f"Starting classifier service. Postgres: {settings.postgres_dsn != ''}")
+if __name__ == "__main__":
+    asyncio.run(main())

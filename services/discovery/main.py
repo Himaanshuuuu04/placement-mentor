@@ -1,11 +1,11 @@
-
-import logging
-from shared.api import create_app
+import asyncio
+from bullmq import Worker
 from shared.config import settings
+from worker import process_discovery
 
-app = create_app("discovery")
-logger = logging.getLogger(__name__)
+async def main():
+    worker = Worker("crawl-discovery", process_discovery, {"connection": {"host": settings.redis_host, "port": settings.redis_port}})
+    await asyncio.Future()
 
-@app.on_event("startup")
-async def startup_event():
-    logger.info(f"Starting discovery service. Postgres: {settings.postgres_dsn != ''}")
+if __name__ == "__main__":
+    asyncio.run(main())

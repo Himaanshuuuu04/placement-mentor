@@ -6,6 +6,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         "fastapi", "uvicorn", "pydantic", "pydantic-settings",
-        "asgi-correlation-id", "python-json-logger", "bullmq"
+        "asgi-correlation-id", "python-json-logger", "bullmq",
+        "asyncpg", "motor", "minio", "ollama", "beautifulsoup4", "markdownify", "httpx"
     ]
 )

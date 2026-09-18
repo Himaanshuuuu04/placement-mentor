@@ -1,0 +1,15 @@
+C4Context
+    title System Context Diagram - AI-Powered Agentic Placement Mentor
+
+    Person(student, "Student", "A computer science student preparing for technical placements.")
+    Person(admin, "Administrator", "System admin managing users and system configuration.")
+
+    System(placementMentor, "Placement Mentor", "AI-powered platform providing personalized preparation, coding assessment, mock interviews, and mentoring.")
+
+    System_Ext(webSources, "Web Sources", "External company websites, blogs, and documentation for knowledge ingestion.")
+    System_Ext(llmProviders, "LLM Providers", "External APIs providing foundational model intelligence (e.g., OpenAI, Anthropic).")
+
+    Rel(student, placementMentor, "Uses for interview prep, coding, and mentoring", "HTTPS/WSS/WebRTC")
+    Rel(admin, placementMentor, "Manages system and views analytics", "HTTPS")
+    Rel(placementMentor, webSources, "Crawls to build knowledge base", "HTTPS")
+    Rel(placementMentor, llmProviders, "Requests reasoning and generation", "HTTPS")

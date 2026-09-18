@@ -1,0 +1,45 @@
+C4Container
+    title Container Diagram - AI-Powered Agentic Placement Mentor
+
+    Person(student, "Student", "Uses the platform for placement preparation")
+
+    Container_Boundary(c0, "Placement Mentor System") {
+        Container(webApp, "Web Application", "Next.js", "Provides the user interface for students")
+        Container(apiGateway, "API Gateway / BFF", "Node.js/Go", "Routes API requests and acts as Backend-For-Frontend")
+        Container(realtimeGateway, "Realtime Gateway", "Node.js/Go", "Handles WebSocket and WebRTC connections")
+        
+        Container(learningPlatform, "Learning Platform Services", "Microservices", "Manages users, roles, mastery, assessments, and roadmaps")
+        Container(agentPlatform, "AI Agent Platform", "Python, LangGraph", "Orchestrates multi-agent interactions and LLM calls")
+        Container(ingestionPlatform, "Knowledge Ingestion Platform", "Python, Crawl4AI", "Crawls, processes, and indexes external knowledge")
+        Container(executionPlatform, "Secure Execution Platform", "Go, Judge0, Firecracker", "Executes untrusted student code securely")
+        
+        ContainerDb(postgres, "Relational Database", "PostgreSQL", "System of record for transactional state")
+        ContainerDb(mongo, "Knowledge Database", "MongoDB Vector Search", "Stores documents, chunks, and vector embeddings")
+        ContainerDb(redis, "Cache & Queues", "Redis", "BullMQ queues, caching, and rate limiting")
+        ContainerDb(s3, "Object Storage", "S3", "Stores raw ingestion artifacts and processed documents")
+    }
+
+    System_Ext(llmApi, "LLM Provider API", "External LLM Services")
+    System_Ext(webSources, "External Web Sources", "Company sites, docs")
+
+    Rel(student, webApp, "Visits", "HTTPS")
+    Rel(webApp, apiGateway, "Makes API calls", "JSON/HTTPS")
+    Rel(webApp, realtimeGateway, "Realtime communication", "WSS/WebRTC")
+    
+    Rel(apiGateway, learningPlatform, "Routes requests", "gRPC/HTTP")
+    Rel(realtimeGateway, agentPlatform, "Streams events/audio", "gRPC/HTTP")
+    
+    Rel(learningPlatform, postgres, "Reads/Writes", "TCP")
+    Rel(learningPlatform, redis, "Publishes events/jobs", "TCP")
+    Rel(learningPlatform, executionPlatform, "Requests execution", "gRPC/HTTP")
+    
+    Rel(agentPlatform, llmApi, "Prompts", "HTTPS")
+    Rel(agentPlatform, learningPlatform, "Uses tools/APIs", "gRPC/HTTP")
+    Rel(agentPlatform, mongo, "Retrieves context", "TCP")
+    
+    Rel(ingestionPlatform, webSources, "Crawls", "HTTPS")
+    Rel(ingestionPlatform, s3, "Stores raw files", "S3 API")
+    Rel(ingestionPlatform, mongo, "Indexes embeddings", "TCP")
+    Rel(ingestionPlatform, redis, "Consumes jobs", "TCP")
+    
+    Rel(executionPlatform, postgres, "Writes results", "TCP")

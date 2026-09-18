@@ -1,0 +1,15 @@
+flowchart TD
+    UserQuery[User Query] --> Norm[Query Normalization]
+    Norm --> Intent[Intent & Topic Extraction]
+    Intent --> MetaFilter[Metadata Filtering Setup]
+    
+    MetaFilter --> VectorRet[Vector Retrieval]
+    MetaFilter --> KeywordRet[Keyword Retrieval]
+    
+    VectorRet --> Hybrid[Hybrid Ranking]
+    KeywordRet --> Hybrid
+    
+    Hybrid --> Rerank[Reranking]
+    Rerank --> Context[Context Assembly]
+    Context --> LLM[Large Language Model]
+    LLM --> Response[Generated Answer with Provenance]

@@ -1,0 +1,72 @@
+flowchart TD
+    API[API Gateway]
+    RT[Realtime Gateway]
+
+    subgraph Plane_A_Learning[PLANE A - Learning Platform]
+        User[User / Identity Service]
+        CompanyRole[Company & Role Service]
+        Topic[Topic / Competency Service]
+        Question[Question Bank Service]
+        Assessment[Assessment Service]
+        Mastery[Knowledge Tracing / Mastery Service]
+        Roadmap[Roadmap / Personalization Service]
+        Interview[Interview Service]
+    end
+
+    subgraph Plane_B_Agent[PLANE B - Agent Platform]
+        Orchestrator[Agent Orchestrator]
+        CodeEval[Code Evaluator Agent]
+        SDMentor[System Design Mentor]
+        IntConductor[Interview Conductor]
+        QGen[Question Generator]
+        FeedbackGen[Feedback Generator]
+        Retrieval[Retrieval Service]
+    end
+
+    subgraph Plane_C_Ingestion[PLANE C - Knowledge Acquisition]
+        Discovery[Data Discovery Service]
+        Crawl[Crawl Service]
+        DocProcess[Document Processing Service]
+        Classification[Knowledge Classification Service]
+        Dedupe[Deduplication Service]
+        Embedding[Embedding / Indexing Service]
+    end
+
+    subgraph Plane_D_Execution[PLANE D - Secure Execution]
+        ExecSvc[Code Execution Service]
+        Judge0[Judge0]
+        Firecracker[Firecracker microVMs]
+    end
+
+    API --> User
+    API --> CompanyRole
+    API --> Topic
+    API --> Question
+    API --> Assessment
+    API --> Mastery
+    API --> Roadmap
+    API --> Interview
+    
+    RT --> Interview
+    RT --> Orchestrator
+
+    Assessment --> ExecSvc
+    ExecSvc --> Judge0
+    Judge0 --> Firecracker
+    
+    Orchestrator --> CodeEval
+    Orchestrator --> SDMentor
+    Orchestrator --> IntConductor
+    Orchestrator --> QGen
+    Orchestrator --> FeedbackGen
+    Orchestrator --> Retrieval
+    
+    CodeEval --> Mastery
+    IntConductor --> Mastery
+    QGen --> Question
+    
+    Discovery --> Crawl
+    Crawl --> DocProcess
+    DocProcess --> Classification
+    Classification --> Dedupe
+    Dedupe --> Embedding

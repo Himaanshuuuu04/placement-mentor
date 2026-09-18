@@ -1,0 +1,20 @@
+stateDiagram-v2
+    [*] --> Router
+
+    Router --> CodeEvaluator: Submission
+    Router --> InterviewConductor: Interview Session
+    Router --> SystemDesignMentor: System Design
+    Router --> QuestionGenerator: Need Question
+    Router --> FeedbackGenerator: Need Feedback
+
+    CodeEvaluator --> KnowledgeTracer: Evaluation Signals
+    InterviewConductor --> KnowledgeTracer: Interview Signals
+    SystemDesignMentor --> KnowledgeTracer: Mentoring Signals
+
+    KnowledgeTracer --> Router: Updated Mastery State
+
+    CodeEvaluator --> [*]
+    InterviewConductor --> [*]
+    SystemDesignMentor --> [*]
+    QuestionGenerator --> [*]
+    FeedbackGenerator --> [*]

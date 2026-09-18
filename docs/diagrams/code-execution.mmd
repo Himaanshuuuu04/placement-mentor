@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant F as Frontend
+    participant A as Assessment Service
+    participant C as Code Execution Service
+    participant J as Judge0
+    participant VM as Firecracker microVM
+    participant E as Evaluation Service
+
+    F->>A: Submit Code (Submission)
+    A->>C: ExecutionRequested Event/API
+    C->>J: Enqueue Execution Job (Resource Limits)
+    J->>VM: Spawn MicroVM & Execute
+    VM-->>J: Execution Result / Timeout
+    J-->>C: Result Collection
+    C->>A: ExecutionCompleted Event
+    C->>E: Send Execution Result
+    E->>E: AI-based Code Evaluation
+    E->>A: EvaluationCompleted Event
+    A-->>F: Return Evaluation & Result

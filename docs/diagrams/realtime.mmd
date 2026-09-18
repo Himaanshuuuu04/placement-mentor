@@ -1,0 +1,32 @@
+flowchart LR
+    subgraph Client
+        UI[Next.js App]
+        WS_Client[WebSocket Client]
+        RTC_Client[WebRTC Client]
+    end
+
+    subgraph Realtime_Gateway
+        WS_GW[WebSocket Gateway]
+        Signaling[WebRTC Signaling Server]
+        MediaLayer[Media / SFU Layer]
+    end
+
+    subgraph Backend_Services
+        IntSvc[Interview Service]
+        Speech[Speech-to-Text / Text-to-Speech]
+        LangGraph[Agent Orchestrator]
+    end
+
+    UI --> WS_Client
+    UI --> RTC_Client
+
+    WS_Client <-->|Text, Events, Presence| WS_GW
+    RTC_Client <-->|Signaling| Signaling
+    RTC_Client <-->|Audio Stream| MediaLayer
+
+    WS_GW <--> IntSvc
+    Signaling <--> IntSvc
+    MediaLayer --> Speech
+    Speech --> IntSvc
+
+    IntSvc <--> LangGraph
